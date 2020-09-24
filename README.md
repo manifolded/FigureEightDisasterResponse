@@ -2,6 +2,9 @@
 
 Develop an ML pipeline to triage the deluge of incoming text messages and social media posts during a typical major disaster.
 
+![]()
+<a href='https://www.freepik.com/vectors/abstract'>Abstract vector created by macrovector - www.freepik.com</a>
+
 ## Motivation
 
 Figure Eight has provided this data from several natural disasters as a challenge in the hopes that we can build a useful model from it.  The messages have been translated into English, as needed, and meticulously labeled in 36 categories like 'missing_people', 'search_and_rescue', 'medical_products', etc.  The goal is to predict how new messages would be categorized with a machine learning pipeline.
