@@ -2,7 +2,7 @@
 
 Develop an ML pipeline to triage the deluge of incoming text messages and social media posts during a typical major disaster.
 
-![]()
+![](https://github.com/manifolded/FigureEightDisasterResponse/blob/master/Images/26719.jpg?raw=true)
 <a href='https://www.freepik.com/vectors/abstract'>Abstract vector created by macrovector - www.freepik.com</a>
 
 ## Motivation
