@@ -8,3 +8,11 @@ Figure Eight has provided this data from several natural disasters as a challeng
 
 Immediately after a disaster aid agencies are simultaneously deluged with messages exactly when their staff are already overwhelmed.  A few of these messages are critical while most are not so helpful.  If a machine could label these messages automatically at least they could be directed to the right agency if not sorted by their importance.  This is the machine we are tasked with inventing.
 
+The final product is to be presented through a web app we will construct.
+
+## Trying Out The Code
+
+There's nothing to install yet.  However, you are welcome to have a look at my Jupyter dev notebooks and see what is working and what is not.  
+
+The `data` directory contains code related to ingesting the dataset provided by Figure Eight and consolidating it in a SQLlite database.  Have a look at 'ETL Pipeline Preparation.ipynb'.  Current work is focused developing the ML pipeline and you can have a look at my progress by examining the 'ML Pipeline Preparation.ipynb' notebook.
+
