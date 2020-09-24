@@ -2,4 +2,5 @@
 *.db
 *.csv
 *.npy
+*.pkl
 *~
