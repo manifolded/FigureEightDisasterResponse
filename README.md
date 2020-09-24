@@ -16,3 +16,6 @@ There's nothing to install yet.  However, you are welcome to have a look at my J
 
 The `data` directory contains code related to ingesting the dataset provided by Figure Eight and consolidating it in a SQLlite database.  Have a look at 'ETL Pipeline Preparation.ipynb'.  Current work is focused developing the ML pipeline and you can have a look at my progress by examining the 'ML Pipeline Preparation.ipynb' notebook.
 
+## Acknowledgements
+
+Thanks for Figure Eight for providing me the data, and Udacity to introducing me to the techniques.  Cheers.
