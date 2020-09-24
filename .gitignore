@@ -3,4 +3,5 @@
 *.csv
 *.npy
 *.pkl
+.DS_Store
 *~
