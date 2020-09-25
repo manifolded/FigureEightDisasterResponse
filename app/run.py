@@ -14,12 +14,13 @@ import joblib
 
 from sqlalchemy import create_engine
 
-import nltk
-nltk.download('punkt')
-nltk.download('wordnet')
+# import nltk
+# nltk.download('punkt')
+# nltk.download('wordnet')
 
 app = Flask(__name__)
 
+# Why am I using the stock tokenizer?  Shouldn't I be using mine?
 def tokenize(text):
     tokens = word_tokenize(text)
     lemmatizer = WordNetLemmatizer()
@@ -89,6 +90,8 @@ def go():
     # use model to predict classification for query
     classification_labels = model.predict([query])[0]
     classification_results = dict(zip(df.columns[4:], classification_labels))
+#     print(*classification_labels)
+#     print(*classification_results)
 
     # This will render the go.html Please see that file. 
     return render_template(
