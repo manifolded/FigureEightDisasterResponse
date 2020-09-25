@@ -3,6 +3,6 @@
 *.csv
 *.npy
 *.pkl
-model/TestingDatabaseFileReading.ipynb
+models/TestingDatabaseFileReading.ipynb
 .DS_Store
 *~
