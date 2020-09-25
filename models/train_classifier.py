@@ -44,7 +44,7 @@ def load_data(database_filepath):
     df = pd.read_sql_table('MessageCategorization', engine)
 
     in_columns = 'message'
-    out_columns = list(df.columns)[5:]
+    out_columns = list(df.columns)[4:]
 
     # remove outliers from 'related' column
     df['related'] = np.clip(df['related'], 0, 1)
