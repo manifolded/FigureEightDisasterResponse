@@ -18,19 +18,28 @@ from sqlalchemy import create_engine
 # nltk.download('punkt')
 # nltk.download('wordnet')
 
+import spacy
+en_nlp = spacy.load('en')
+stopwords = spacy.lang.en.stop_words.STOP_WORDS
+
+from nltk.stem.snowball import SnowballStemmer
+stemmer = SnowballStemmer('english')
+
 app = Flask(__name__)
 
-# Why am I using the stock tokenizer?  Shouldn't I be using mine?
+# https://realpython.com/natural-language-processing-spacy-python/ was very 
+#	helpful as I struggled to build my first tokenizer.
 def tokenize(text):
-    tokens = word_tokenize(text)
-    lemmatizer = WordNetLemmatizer()
-
-    clean_tokens = []
-    for tok in tokens:
-        clean_tok = lemmatizer.lemmatize(tok).lower().strip()
-        clean_tokens.append(clean_tok)
-
-    return clean_tokens
+    # tokenize the text using spacy's model for English
+    doc = en_nlp(text)
+    # while we lemmatize the now tokenized text, let's not forget to drop
+    #   tokens that are stop_words or punctuation
+    lemmas = [token.lemma_ for token in doc
+        if token not in stopwords and not token.is_punct]
+    # Had better luck with this nltk stemmer
+    stems = [stemmer.stem(lemma) for lemma in lemmas]
+    return stems
+	
 
 # load data
 engine = create_engine('sqlite:///../data/DisasterResponse.db')
