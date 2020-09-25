@@ -4,6 +4,6 @@
 *.npy
 *.pkl
 models/TestingDatabaseFileReading.ipynb
-models/TestModelOutputParsing.ipynb
+app/TestModelOutputParsing.ipynb
 .DS_Store
 *~
