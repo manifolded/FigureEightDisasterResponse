@@ -6,5 +6,6 @@
 models/TestingDatabaseFileReading.ipynb
 app/TestModelOutputParsing.ipynb
 models/GeneratingNovelPlots.ipynb
+models/predicted.joblib
 .DS_Store
 *~
