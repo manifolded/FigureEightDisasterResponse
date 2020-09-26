@@ -51,7 +51,7 @@ def genF1PlotData(true, predicted):
 	n = true.shape[1]
 	result = np.empty(shape=n)
 	for i in range(n):
-		result[i] = f1_score(true[:,i], predicted[:,i], zero_division=0, average='micro')
+		result[i] = f1_score(true[:,i], predicted[:,i], zero_division=0, average='micro', labels=[1])
 	return result
 	
 
