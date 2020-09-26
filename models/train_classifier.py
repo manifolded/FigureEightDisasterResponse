@@ -14,6 +14,7 @@ from sklearn.metrics import precision_score
 from sklearn.metrics import recall_score
 from sklearn.metrics import f1_score
 import pickle as pkl
+import joblib
 
 en_nlp = spacy.load('en')
 stopwords = spacy.lang.en.stop_words.STOP_WORDS
@@ -85,7 +86,13 @@ def evaluate_model(model, text_test, y_test, category_names):
     y_pred = model.predict(text_test)
     print('Test data cv score = {0:.2f}'.format(model.score(text_test, y_test)))
     printScores(category_names, y_test, y_pred, zero_division=0)
+    return y_pred
 
+
+def save_predictions(y_predict):
+	with open('predicted.joblib', 'wb') as f:
+		joblib.dump(y_predict, f)
+		
 
 def save_model(model, model_filepath):
     with open(model_filepath, 'wb') as f:
@@ -97,7 +104,7 @@ def main():
         database_filepath, model_filepath = sys.argv[1:]
         print('Loading data...\n    DATABASE: {}'.format(database_filepath))
         X, Y, category_names = load_data(database_filepath)
-        X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2)
+        X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.33)
 
         print('Building model...')
         model = build_model()
@@ -106,7 +113,10 @@ def main():
         model.fit(X_train, Y_train)
 
         print('Evaluating model...')
-        evaluate_model(model, X_test, Y_test, category_names)
+        y_predict = evaluate_model(model, X_test, Y_test, category_names)
+        
+        print('Saving predictions...\n    FILE: predicted.joblib')
+        save_predictions(y_predict)
 
         print('Saving model...\n    MODEL: {}'.format(model_filepath))
         save_model(model, model_filepath)
