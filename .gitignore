@@ -3,6 +3,7 @@
 *.csv
 *.npy
 *.pkl
+*.joblib
 models/TestingDatabaseFileReading.ipynb
 app/TestModelOutputParsing.ipynb
 models/GeneratingNovelPlots.ipynb
