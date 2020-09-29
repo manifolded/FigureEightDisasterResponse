@@ -3,8 +3,8 @@ import pandas as pd
 from sqlalchemy import create_engine
 
 # load_data()
-# Ingests message and category data from files and returns a single dataframe holding
-# both parts of the data.
+# Ingests message and category data from files and returns a single dataframe
+# holding both parts of the data.
 def load_data(messages_filepath, categories_filepath):
     # Load the two source .csv's into DataFrames
     messages = pd.read_csv(messages_filepath)
@@ -20,11 +20,12 @@ def load_data(messages_filepath, categories_filepath):
 
     # Extract the last character of each entry as the value
     for column in categories:
-        # set each value to be the last character of the string and cast it to int
+        # set value to be the last character of the string and cast it to int
         categories[column] = categories[column].str.slice(start=-1).astype(int)
 
     # Finally we have to merge the two datasets into one
-    return pd.merge(left=messages, right=categories, left_index=True, right_index=True, copy=True)
+    return pd.merge(left=messages, right=categories,
+        left_index=True, right_index=True, copy=True)
 
 
 # clean_data()
@@ -44,7 +45,7 @@ def save_data(df, database_filename):
 def main():
     if len(sys.argv) == 4:
 
-        messages_filepath, categories_filepath, database_filepath = sys.argv[1:]
+        messages_filepath, categories_filepath, database_filepath= sys.argv[1:]
 
         print('Loading data...\n    MESSAGES: {}\n    CATEGORIES: {}'
               .format(messages_filepath, categories_filepath))
