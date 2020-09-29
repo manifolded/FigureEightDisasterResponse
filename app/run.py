@@ -33,8 +33,11 @@ stemmer = SnowballStemmer('english')
 
 app = Flask(__name__)
 
-# https://realpython.com/natural-language-processing-spacy-python/ was very 
-#	helpful as I struggled to build my first tokenizer.
+#  tokenize() 
+#  Function takes a string containing a message and returns a list of tokens
+#
+#    https://realpython.com/natural-language-processing-spacy-python/ was very 
+#	   helpful as I struggled to build my first tokenizer.
 def tokenize(text):
     # tokenize the text using spacy's model for English
     doc = en_nlp(text)
@@ -46,12 +49,15 @@ def tokenize(text):
     stems = [stemmer.stem(lemma) for lemma in lemmas]
     return stems
 	
-
+#  genF1PlotData()
+#  Function takes true and predicted y values and computes an f1 score for every 
+#	 target category separately
 def genF1PlotData(true, predicted):
 	n = true.shape[1]
 	result = np.empty(shape=n)
 	for i in range(n):
-		result[i] = f1_score(true[:,i], predicted[:,i], zero_division=0, average='micro', labels=[1])
+		result[i] = f1_score(true[:,i], predicted[:,i], zero_division=0, average='micro',\
+			labels=[1])
 	return result
 	
 
@@ -59,7 +65,8 @@ def genF1PlotData(true, predicted):
 engine = create_engine('sqlite:///../data/DisasterResponse.db')
 df = pd.read_sql_table('MessageCategorization', engine)
 # Originally I was going to compute the predicted values, but this takes several 
-# minutes and we don't want our web server to be slow, so instead I'll read them from disk
+# minutes and we don't want our web server to be slow.  Let's compute those values
+# in train_classifier.py and write them to disk.  Here we justread them back.
 with open('../models/predicted.joblib', 'rb') as f:
 	y_predicted = joblib.load(f)
 
@@ -76,7 +83,8 @@ def index():
     # extract data needed for visuals
     y_names = list(df.columns)[4:]
     num_pos = df[y_names].sum()
-    
+
+	# only compute f1 scores on test data, thus we must perform train/test split    
     text = df['message'].values
     y = df[y_names].values
     text_train, text_test, y_train, y_test = train_test_split(text, y, \
@@ -84,7 +92,8 @@ def index():
 
     print(y_test.shape)
     print(y_predicted.shape)
-    
+
+	# compute f1 scores for first plot
     f1_values = genF1PlotData(y_test, y_predicted)
     
     # create visuals
@@ -99,12 +108,13 @@ def index():
             ],
 
             'layout': {
-                'title': 'Model Validity Vs. Inbalance',
+                'title': 'Model Accuracy Vs. Inbalance',
                 'yaxis': {
                     'title': "f1 Score"
                 },
                 'xaxis': {
-                    'title': "Number of positives"
+                    'title': "Number of positives",
+                    'type': "log"
                 }
             }
         },
