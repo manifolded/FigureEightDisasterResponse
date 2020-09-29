@@ -32,6 +32,7 @@ def gen_token_table(model, n_vocab):
         token_vector[i] = 1
         # compute categories for that single token and append to table
         result[i] = model.predict([token_vector])
+
     return result
 
 
@@ -46,6 +47,7 @@ def gen_canon_table(token_table, vocab):
         token_indices = np.where(category_vector == 1)[0]
         # A wily trick for indexing a list
         result.append(list(np.array(vocab)[token_indices]))
+
     return(result)
 
 
@@ -59,6 +61,7 @@ def gen_score_table(true, pred, zero_division='warn'):
             [precision_score(true[:,i], pred[:,i], zero_division=zero_division),
             recall_score(true[:,i], pred[:,i], zero_division=zero_division),
             f1_score(true[:,i], pred[:,i], zero_division=zero_division)]
+
     return table
 
 # print_scores()
@@ -113,6 +116,7 @@ def tokenize(text):
     lemmas = [token.lemma_ for token in doc
         if token not in stopwords and not token.is_punct]
     # Had better luck with this nltk stemmer
+    
     return [stemmer.stem(lemma) for lemma in lemmas]
 
 

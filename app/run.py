@@ -47,6 +47,7 @@ def tokenize(text):
         if token not in stopwords and not token.is_punct]
     # Had better luck with this nltk stemmer
     stems = [stemmer.stem(lemma) for lemma in lemmas]
+
     return stems
 
 #  gen_f1_plot_data()
@@ -58,6 +59,7 @@ def gen_f1_plot_data(true, predicted):
 	for i in range(n):
 		result[i] = f1_score(true[:,i], predicted[:,i], zero_division=0, average='micro',\
 			labels=[1])
+            
 	return result
 
 
