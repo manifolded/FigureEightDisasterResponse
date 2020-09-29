@@ -52,8 +52,8 @@ def gen_canon_table(token_table, vocab):
 
 
 # gen_score_table()
-# Takes the true and predicted y-values and returns a 2-D array containing the precision,
-# recall and f1 scores for each target category.
+# Takes the true and predicted y-values and returns a 2-D array containing the
+# precision, recall and f1 scores for each target category.
 def gen_score_table(true, pred, zero_division='warn'):
     table = np.empty(shape=(true.shape[1], 3))
     for i in range(true.shape[1]):
@@ -65,8 +65,8 @@ def gen_score_table(true, pred, zero_division='warn'):
     return table
 
 # print_scores()
-# Takes the true and predicted y-values, and their column labels, and generates a
-# nicely formatted version of the gen_score_table() table.
+# Takes the true and predicted y-values, and their column labels, and generates
+# a nicely formatted version of the gen_score_table() table.
 def print_scores(labels, true, pred, zero_division='warn'):
     results = gen_score_table(true, pred, zero_division=zero_division)
     print("{0:>20}".format(''), 'prec', 'recall', 'f1', sep='\t')
@@ -76,9 +76,10 @@ def print_scores(labels, true, pred, zero_division='warn'):
 
 
 # load_data()
-# Takes the path to the database file containing the data and extracts the X and y
-# data and the category labels and returns them.  Note that 'X' data is here called
-# 'text' since the vectorizer isn't formally considered part of the pipeline.
+# Takes the path to the database file containing the data and extracts the X
+# and y data and the category labels and returns them.  Note that 'X' data is
+# here called 'text' since the vectorizer isn't formally considered part of
+# the pipeline.
 def load_data(database_filepath):
     # open the database file created by previous script
     engine = sqal.create_engine('sqlite:///' + database_filepath)
@@ -103,11 +104,11 @@ def load_data(database_filepath):
 
 # tokenize()
 # Takes a string (the message) and normalizes it by first tokenizing and then
-# lemmatizing the words using the spaCy library.  Finally the tokens are stemmed.
-# The resulting list of tokens is returned.
+# lemmatizing the words using the spaCy library.  Finally the tokens are
+# stemmed.  The resulting list of tokens is returned.
 #
-# https://realpython.com/natural-language-processing-spacy-python/ was helpful in
-# determining which among the bewildering array of options I should employ.
+# https://realpython.com/natural-language-processing-spacy-python/ was helpful
+# in determining which among the bewildering array of options I should employ.
 def tokenize(text):
     # tokenize the text using spacy's model for English
     doc = en_nlp(text)
@@ -116,7 +117,7 @@ def tokenize(text):
     lemmas = [token.lemma_ for token in doc
         if token not in stopwords and not token.is_punct]
     # Had better luck with this nltk stemmer
-    
+
     return [stemmer.stem(lemma) for lemma in lemmas]
 
 
@@ -149,7 +150,8 @@ def build_model(nlp_model, ml_model):
 # the breakdown of precision, recall and f1 scores by target category.
 def evaluate_model(model, text_test, y_test, y_predict, category_names):
 	# y_pred = model.predict(text_test)
-    print('Test data cv score = {0:.2f}'.format(model.score(text_test, y_test)))
+    print('Test data cv score = {0:.2f}'.format(model.score(text_test,
+        y_test)))
     print_scores(category_names, y_test, y_predict, zero_division=0)
     # return y_pred
 
@@ -166,7 +168,8 @@ def main():
         database_filepath, model_filepath = sys.argv[1:]
         print('Loading data...\n    DATABASE: {}'.format(database_filepath))
         text, y, category_names = load_data(database_filepath)
-        text_train, text_test, y_train, y_test = train_test_split(text, y, test_size=0.33)
+        text_train, text_test, y_train, y_test
+            = train_test_split(text, y, test_size=0.33)
 
         print('Building model...')
         nlp_model = build_nlp_model()

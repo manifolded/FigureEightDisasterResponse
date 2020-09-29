@@ -51,24 +51,25 @@ def tokenize(text):
     return stems
 
 #  gen_f1_plot_data()
-#  Function takes true and predicted y values and computes an f1 score for every
-#	 target category separately
+#  Function takes true and predicted y values and computes an f1 score for
+#  every target category separately
 def gen_f1_plot_data(true, predicted):
 	n = true.shape[1]
 	result = np.empty(shape=n)
 	for i in range(n):
-		result[i] = f1_score(true[:,i], predicted[:,i], zero_division=0, average='micro',\
-			labels=[1])
-            
+		result[i] = f1_score(true[:,i], predicted[:,i], zero_division=0,
+            average='micro', labels=[1])
+
 	return result
 
 
 # load data
 engine = create_engine('sqlite:///../data/DisasterResponse.db')
 df = pd.read_sql_table('MessageCategorization', engine)
-# Originally I was going to compute the predicted values, but this takes several
-# minutes and we don't want our web server to be slow.  Let's compute those values
-# in train_classifier.py and write them to disk.  Here we justread them back.
+# Originally I was going to compute the predicted values, but this takes
+# several minutes and we don't want our web server to be slow.  Let's compute
+# those values in train_classifier.py and write them to disk.  Then here we
+# just read them back.
 with open('../models/predicted.joblib', 'rb') as f:
 	y_predicted = joblib.load(f)
 with open('../models/canon.joblib', 'rb') as f:
@@ -87,7 +88,8 @@ def index():
     y_names = list(df.columns)[4:]
     num_pos = df[y_names].sum()
 
-	# only compute f1 scores on test data, thus we must perform train/test split
+	# only compute f1 scores on test data, thus we must perform train/test
+    # split
     text = df['message'].values
     y = df[y_names].values
     text_train, text_test, y_train, y_test = train_test_split(text, y, \
