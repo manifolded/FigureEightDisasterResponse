@@ -38,7 +38,8 @@ def clean_data(df):
 def save_data(df, database_filename):
     """Constructs a database and writes the dataframe to it."""
     engine = create_engine('sqlite:///'+database_filename)
-    df.to_sql('MessageCategorization', engine, index=False)
+    df.to_sql('MessageCategorization', engine, index=False,
+              if_exists='replace')
     return
 
 
