@@ -20,7 +20,11 @@ en_nlp = spacy.load('en')
 stopwords = spacy.lang.en.stop_words.STOP_WORDS
 stemmer = SnowballStemmer('english')
 
-def genTable(true, pred, zero_division='warn'):
+
+# genScoreTable()
+# Takes the true and predicted y-values and returns a 2-D array containing the precision,
+# recall and f1 scores for each target category.
+def genScoreTable(true, pred, zero_division='warn'):
     table = np.empty(shape=(true.shape[1], 3))
     for i in range(true.shape[1]):
         table[i] = \
@@ -29,15 +33,22 @@ def genTable(true, pred, zero_division='warn'):
             f1_score(true[:,i], pred[:,i], zero_division=zero_division)]
     return table
 
-
+# printScores()
+# Takes the true and predicted y-values, and their column labels, and generates a
+# nicely formatted version of the genScoreTable() table.
 def printScores(labels, true, pred, zero_division='warn'):
-    results = genTable(true, pred, zero_division=zero_division)
+    results = genScoreTable(true, pred, zero_division=zero_division)
     print("{0:>20}".format(''), 'prec', 'recall', 'f1', sep='\t')
     for i in range(results.shape[0]):
         print("{0:>20}".format(labels[i]), '%.2f' % results[i, 0],
             '%.2f' % results[i,1], '%.2f' % results[i,2], sep = '\t')
 
 
+
+# load_data()
+# Takes the path to the database file containing the data and extracts the X and y
+# data and the category labels and returns them.  Note that 'X' data is here called
+# 'text' since the vectorizer isn't formally considered part of the pipeline.
 def load_data(database_filepath):
     # open the database file created by previous script
     engine = sqal.create_engine('sqlite:///' + database_filepath)
@@ -60,7 +71,14 @@ def load_data(database_filepath):
     return text, y, out_columns
 
 
-# https://realpython.com/natural-language-processing-spacy-python/ was helpful
+
+# tokenize()
+# Takes a string (the message) and normalizes it by first tokenizing and then 
+# lemmatizing the words using the spaCy library.  Finally the tokens are stemmed.
+# The resulting list of tokens is returned.
+#
+# https://realpython.com/natural-language-processing-spacy-python/ was helpful in 
+# determining which among the bewildering array of options I should employ.
 def tokenize(text):
     # tokenize the text using spacy's model for English
     doc = en_nlp(text)
@@ -72,6 +90,8 @@ def tokenize(text):
     return [stemmer.stem(lemma) for lemma in lemmas]
 
 
+# build_model()
+# Constructs the optimized analysis pipeline and returns it.
 def build_model():
     model = make_pipeline(
         TfidfVectorizer(tokenizer=tokenize, min_df=5),
@@ -82,6 +102,10 @@ def build_model():
     return model
 
 
+# evaluate_model()
+# Computes the predicted y-values, y_pred, and uses them to output the test data 
+# cv score and the breakdown of precision, recall and f1 scores by target category.  
+# These two steps typically take several minutes.  y_pred is returned
 def evaluate_model(model, text_test, y_test, category_names):
     y_pred = model.predict(text_test)
     print('Test data cv score = {0:.2f}'.format(model.score(text_test, y_test)))
@@ -89,11 +113,15 @@ def evaluate_model(model, text_test, y_test, category_names):
     return y_pred
 
 
-def save_predictions(y_predict):
+# save_predictions()
+# Takes an array and saves it to disk.  The array is intended to be y_pred
+def save_predictions(y_pred):
 	with open('predicted.joblib', 'wb') as f:
-		joblib.dump(y_predict, f)
+		joblib.dump(y_pred, f)
 		
 
+# save_model()
+# Saves the model to a pickle file
 def save_model(model, model_filepath):
     with open(model_filepath, 'wb') as f:
         pkl.dump(model, f)
