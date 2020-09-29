@@ -55,13 +55,13 @@ def gen_f1_plot_data(true, predicted):
     """Takes true and predicted y-values and computes an
     f1 score for every target category separately.
     """
-	n = true.shape[1]
-	result = np.empty(shape=n)
-	for i in range(n):
-		result[i] = f1_score(true[:,i], predicted[:,i], zero_division=0,
+    n = true.shape[1]
+    result = np.empty(shape=n)
+    for i in range(n):
+        result[i] = f1_score(true[:,i], predicted[:,i], zero_division=0,
             average='micro', labels=[1])
 
-	return result
+    return result
 
 
 # load data
