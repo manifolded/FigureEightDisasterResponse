@@ -127,8 +127,8 @@ def tokenize(text):
 
 def build_nlp_model():
     """Construct the nlp first stage for the pipeline and returns it."""
-	return make_pipeline(
-		TfidfVectorizer(tokenizer=tokenize, min_df=5))
+    return make_pipeline(
+        TfidfVectorizer(tokenizer=tokenize, min_df=5))
 
 
 def build_ml_model():
@@ -142,7 +142,7 @@ def build_ml_model():
 
 def build_model(nlp_model, ml_model):
     """Combine the two pieces and return the full pipeline."""
-	return make_pipeline(nlp_model, ml_model)
+    return make_pipeline(nlp_model, ml_model)
 
 
 def evaluate_model(model, text_test, y_test, y_predict, category_names):
@@ -169,7 +169,7 @@ def main():
         database_filepath, model_filepath = sys.argv[1:]
         print('Loading data...\n    DATABASE: {}'.format(database_filepath))
         text, y, category_names = load_data(database_filepath)
-        text_train, text_test, y_train, y_test
+        text_train, text_test, y_train, y_test \
             = train_test_split(text, y, test_size=0.33)
 
         print('Building model...')
