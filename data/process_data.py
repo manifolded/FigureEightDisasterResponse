@@ -2,12 +2,15 @@ import sys
 import pandas as pd
 from sqlalchemy import create_engine
 
+# load_data()
+# Ingests message and category data from files and returns a single dataframe holding
+# both parts of the data.
 def load_data(messages_filepath, categories_filepath):
     # Load the two source .csv's into DataFrames
     messages = pd.read_csv(messages_filepath)
     categories = pd.read_csv(categories_filepath)
 
-    # Unstuff categories column into separate columns
+    # Unpack categories column into separate columns
     categories = categories.categories.str.split(';', expand=True)
 
     # Take the first row from categories and extract the column headers
@@ -23,11 +26,16 @@ def load_data(messages_filepath, categories_filepath):
     # Finally we have to merge the two datasets into one
     return pd.merge(left=messages, right=categories, left_index=True, right_index=True, copy=True)
 
+
+# clean_data()
+# Removes any duplicates from the dataframe
 def clean_data(df):
-    # remove any duplicates in the dataset
     df = df.drop_duplicates()
     return df
 
+
+# save_data()
+# Constructs a database and writes the dataframe to it.
 def save_data(df, database_filename):
     engine = create_engine('sqlite:///'+database_filename)
     df.to_sql('MessageCategorization', engine, index=False)
