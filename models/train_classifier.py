@@ -44,7 +44,6 @@ def printScores(labels, true, pred, zero_division='warn'):
             '%.2f' % results[i,1], '%.2f' % results[i,2], sep = '\t')
 
 
-
 # load_data()
 # Takes the path to the database file containing the data and extracts the X and y
 # data and the category labels and returns them.  Note that 'X' data is here called
@@ -71,13 +70,12 @@ def load_data(database_filepath):
     return text, y, out_columns
 
 
-
 # tokenize()
-# Takes a string (the message) and normalizes it by first tokenizing and then 
+# Takes a string (the message) and normalizes it by first tokenizing and then
 # lemmatizing the words using the spaCy library.  Finally the tokens are stemmed.
 # The resulting list of tokens is returned.
 #
-# https://realpython.com/natural-language-processing-spacy-python/ was helpful in 
+# https://realpython.com/natural-language-processing-spacy-python/ was helpful in
 # determining which among the bewildering array of options I should employ.
 def tokenize(text):
     # tokenize the text using spacy's model for English
@@ -93,34 +91,30 @@ def tokenize(text):
 # build_nlp_model()
 # Construct the nlp first stage for the pipeline and return it
 def build_nlp_model():
-	nlp_model = make_pipeline(
+	return make_pipeline(
 		TfidfVectorizer(tokenizer=tokenize, min_df=5))
-	return nlp_model
 
 
 # build_ml_model()
 # Constructs the ml second stage for the pipeline and return it
 def build_ml_model():
-    ml_model = make_pipeline(
+    return make_pipeline(
         MultiOutputClassifier(
             estimator=AdaBoostClassifier(
                 base_estimator=DecisionTreeClassifier(max_depth=2),
                 n_estimators=10, learning_rate=1)))
-    return ml_model
 
 
 # build_model()
 # Combine the two pieces and return the full pipeline
 def build_model(nlp_model, ml_model):
-	model = make_pipeline(
-		nlp_model, ml_model)
-	return model
+	return make_pipeline(nlp_model, ml_model)
 
 
 # evaluate_model()
-# Computes the predicted y-values, y_pred, and uses them to output the test data 
-# cv score and the breakdown of precision, recall and f1 scores by target category.  
-# These two steps typically take several minutes.  y_pred is returned
+# Takes the predicted y-values, y_predict, along with test samples, text_test,
+# and true results, y_test, and uses them to output the test data cv score and
+# the breakdown of precision, recall and f1 scores by target category.
 def evaluate_model(model, text_test, y_test, y_predict, category_names):
 	# y_pred = model.predict(text_test)
     print('Test data cv score = {0:.2f}'.format(model.score(text_test, y_test)))
@@ -155,7 +149,7 @@ def main():
 
         print('Evaluating model...')
         evaluate_model(model, text_test, y_test, y_predict, category_names)
-        
+
         print('Caching data...\n    FILE: predicted.joblib')
         with open('predicted.joblib', 'wb') as f:
             joblib.dump(y_predict, f)
