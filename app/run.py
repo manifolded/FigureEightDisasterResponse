@@ -33,12 +33,11 @@ stemmer = SnowballStemmer('english')
 
 app = Flask(__name__)
 
-#  tokenize()
-#  Function takes a string containing a message and returns a list of tokens
-#
-#    https://realpython.com/natural-language-processing-spacy-python/ was very
-#	   helpful as I struggled to build my first tokenizer.
+# https://realpython.com/natural-language-processing-spacy-python/ was very
+#   helpful as I struggled to build this, my first, tokenizer.
 def tokenize(text):
+    """Takes a string containing a message and returns a list
+    of tokens."""
     # tokenize the text using spacy's model for English
     doc = en_nlp(text)
     # while we lemmatize the now tokenized text, let's not forget to drop
@@ -51,9 +50,11 @@ def tokenize(text):
     return stems
 
 #  gen_f1_plot_data()
-#  Function takes true and predicted y values and computes an f1 score for
-#  every target category separately
+#
 def gen_f1_plot_data(true, predicted):
+    """Takes true and predicted y-values and computes an
+    f1 score for every target category separately.
+    """
 	n = true.shape[1]
 	result = np.empty(shape=n)
 	for i in range(n):
@@ -66,10 +67,11 @@ def gen_f1_plot_data(true, predicted):
 # load data
 engine = create_engine('sqlite:///../data/DisasterResponse.db')
 df = pd.read_sql_table('MessageCategorization', engine)
-# Originally I was going to compute the predicted values, but this takes
-# several minutes and we don't want our web server to be slow.  Let's compute
-# those values in train_classifier.py and write them to disk.  Then here we
-# just read them back.
+# Originally I was going to compute the predicted values here, but
+# this takes several minutes.  That would be much too slow for this
+# flask app.  Instead, let's pre-compute those values in
+# train_classifier.py and cache them to disk.  Here, we need just
+# fetch them back.
 with open('../models/predicted.joblib', 'rb') as f:
 	y_predicted = joblib.load(f)
 with open('../models/canon.joblib', 'rb') as f:
@@ -88,8 +90,8 @@ def index():
     y_names = list(df.columns)[4:]
     num_pos = df[y_names].sum()
 
-	# only compute f1 scores on test data, thus we must perform train/test
-    # split
+	# Only compute f1 scores on test data, thus we must perform train/test
+    # split here.
     text = df['message'].values
     y = df[y_names].values
     text_train, text_test, y_train, y_test = train_test_split(
@@ -162,8 +164,6 @@ def go():
     # use model to predict classification for query
     classification_labels = model.predict([query])[0]
     classification_results = dict(zip(df.columns[4:], classification_labels))
-#     print(*classification_labels)
-#     print(*classification_results)
 
     # This will render the go.html Please see that file.
     return render_template(
