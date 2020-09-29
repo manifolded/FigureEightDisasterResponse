@@ -92,8 +92,8 @@ def index():
     # split
     text = df['message'].values
     y = df[y_names].values
-    text_train, text_test, y_train, y_test = train_test_split(text, y, \
-    	test_size=0.33, random_state=42)
+    text_train, text_test, y_train, y_test = train_test_split(
+        text, y, test_size=0.33, random_state=42)
 
     print(y_test.shape)
     print(y_predicted.shape)

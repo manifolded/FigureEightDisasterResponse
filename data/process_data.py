@@ -24,8 +24,9 @@ def load_data(messages_filepath, categories_filepath):
         categories[column] = categories[column].str.slice(start=-1).astype(int)
 
     # Finally we have to merge the two datasets into one
-    return pd.merge(left=messages, right=categories,
-        left_index=True, right_index=True, copy=True)
+    return pd.merge(
+        left=messages, right=categories, left_index=True, right_index=True,
+        copy=True)
 
 
 # clean_data()
@@ -41,6 +42,7 @@ def save_data(df, database_filename):
     engine = create_engine('sqlite:///'+database_filename)
     df.to_sql('MessageCategorization', engine, index=False)
     return
+
 
 def main():
     if len(sys.argv) == 4:

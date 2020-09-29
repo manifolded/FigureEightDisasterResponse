@@ -58,7 +58,8 @@ def gen_score_table(true, pred, zero_division='warn'):
     table = np.empty(shape=(true.shape[1], 3))
     for i in range(true.shape[1]):
         table[i] = \
-            [precision_score(true[:,i], pred[:,i], zero_division=zero_division),
+            [precision_score(true[:,i], pred[:,i],
+                zero_division=zero_division),
             recall_score(true[:,i], pred[:,i], zero_division=zero_division),
             f1_score(true[:,i], pred[:,i], zero_division=zero_division)]
 
@@ -150,8 +151,8 @@ def build_model(nlp_model, ml_model):
 # the breakdown of precision, recall and f1 scores by target category.
 def evaluate_model(model, text_test, y_test, y_predict, category_names):
 	# y_pred = model.predict(text_test)
-    print('Test data cv score = {0:.2f}'.format(model.score(text_test,
-        y_test)))
+    print('Test data cv score = {0:.2f}'.format(model.score(
+        text_test, y_test)))
     print_scores(category_names, y_test, y_predict, zero_division=0)
     # return y_pred
 
