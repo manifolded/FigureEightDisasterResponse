@@ -49,10 +49,10 @@ def tokenize(text):
     stems = [stemmer.stem(lemma) for lemma in lemmas]
     return stems
 
-#  genF1PlotData()
+#  gen_f1_plot_data()
 #  Function takes true and predicted y values and computes an f1 score for every
 #	 target category separately
-def genF1PlotData(true, predicted):
+def gen_f1_plot_data(true, predicted):
 	n = true.shape[1]
 	result = np.empty(shape=n)
 	for i in range(n):
@@ -70,7 +70,7 @@ df = pd.read_sql_table('MessageCategorization', engine)
 with open('../models/predicted.joblib', 'rb') as f:
 	y_predicted = joblib.load(f)
 with open('../models/canon.joblib', 'rb') as f:
-    canonTable = joblib.load(f)
+    canon_table = joblib.load(f)
 
 # load model
 model = joblib.load("../models/classifier.pkl")
@@ -95,7 +95,7 @@ def index():
     print(y_predicted.shape)
 
 	# compute f1 scores for first plot
-    f1_values = genF1PlotData(y_test, y_predicted)
+    f1_values = gen_f1_plot_data(y_test, y_predicted)
 
     # create visuals
     graphs = [
@@ -124,7 +124,7 @@ def index():
                 Bar(
                     x=num_pos.index,
                     y=num_pos.values,
-                    text=canonTable
+                    text=canon_table
                 )
             ],
 
