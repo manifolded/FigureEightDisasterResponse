@@ -90,35 +90,43 @@ def tokenize(text):
     return [stemmer.stem(lemma) for lemma in lemmas]
 
 
-# build_model()
-# Constructs the optimized analysis pipeline and returns it.
-def build_model():
-    model = make_pipeline(
-        TfidfVectorizer(tokenizer=tokenize, min_df=5),
+# build_nlp_model()
+# Construct the nlp first stage for the pipeline and return it
+def build_nlp_model():
+	nlp_model = make_pipeline(
+		TfidfVectorizer(tokenizer=tokenize, min_df=5))
+	return nlp_model
+
+
+# build_ml_model()
+# Constructs the ml second stage for the pipeline and return it
+def build_ml_model():
+    ml_model = make_pipeline(
         MultiOutputClassifier(
             estimator=AdaBoostClassifier(
                 base_estimator=DecisionTreeClassifier(max_depth=2),
                 n_estimators=10, learning_rate=1)))
-    return model
+    return ml_model
+
+
+# build_model()
+# Combine the two pieces and return the full pipeline
+def build_model(nlp_model, ml_model):
+	model = make_pipeline(
+		nlp_model, ml_model)
+	return model
 
 
 # evaluate_model()
 # Computes the predicted y-values, y_pred, and uses them to output the test data 
 # cv score and the breakdown of precision, recall and f1 scores by target category.  
 # These two steps typically take several minutes.  y_pred is returned
-def evaluate_model(model, text_test, y_test, category_names):
-    y_pred = model.predict(text_test)
+def evaluate_model(model, text_test, y_test, y_predict, category_names):
+	# y_pred = model.predict(text_test)
     print('Test data cv score = {0:.2f}'.format(model.score(text_test, y_test)))
-    printScores(category_names, y_test, y_pred, zero_division=0)
-    return y_pred
+    printScores(category_names, y_test, y_predict, zero_division=0)
+    # return y_pred
 
-
-# save_predictions()
-# Takes an array and saves it to disk.  The array is intended to be y_pred
-def save_predictions(y_pred):
-	with open('predicted.joblib', 'wb') as f:
-		joblib.dump(y_pred, f)
-		
 
 # save_model()
 # Saves the model to a pickle file
@@ -131,23 +139,32 @@ def main():
     if len(sys.argv) == 3:
         database_filepath, model_filepath = sys.argv[1:]
         print('Loading data...\n    DATABASE: {}'.format(database_filepath))
-        X, Y, category_names = load_data(database_filepath)
-        X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.33)
+        text, y, category_names = load_data(database_filepath)
+        text_train, text_test, y_train, y_test = train_test_split(text, y, test_size=0.33)
 
         print('Building model...')
-        model = build_model()
+        nlp_model = build_nlp_model()
+        ml_model = build_ml_model()
+        model = build_model(nlp_model, ml_model)
 
         print('Training model...')
-        model.fit(X_train, Y_train)
+        X_train = nlp_model.fit_transform(text_train)
+        ml_model.fit(X_train, y_train)
+        X_test = nlp_model.transform(text_test)
+        y_predict = ml_model.predict(X_test)
 
         print('Evaluating model...')
-        y_predict = evaluate_model(model, X_test, Y_test, category_names)
+        evaluate_model(model, text_test, y_test, y_predict, category_names)
         
-        print('Saving predictions...\n    FILE: predicted.joblib')
-        save_predictions(y_predict)
+        print('Caching data...\n    FILE: predicted.joblib')
+        with open('predicted.joblib', 'wb') as f:
+            joblib.dump(y_predict, f)
 
         print('Saving model...\n    MODEL: {}'.format(model_filepath))
         save_model(model, model_filepath)
+        vocab = nlp_model['tfidfvectorizer'].vocabulary_
+        with open('nlp_vocabulary.joblib', 'wb') as f:
+            joblib.dump(vocab, f)
 
         print('Trained model saved!')
 
