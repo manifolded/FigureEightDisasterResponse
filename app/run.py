@@ -33,10 +33,10 @@ stemmer = SnowballStemmer('english')
 
 app = Flask(__name__)
 
-#  tokenize() 
+#  tokenize()
 #  Function takes a string containing a message and returns a list of tokens
 #
-#    https://realpython.com/natural-language-processing-spacy-python/ was very 
+#    https://realpython.com/natural-language-processing-spacy-python/ was very
 #	   helpful as I struggled to build my first tokenizer.
 def tokenize(text):
     # tokenize the text using spacy's model for English
@@ -48,9 +48,9 @@ def tokenize(text):
     # Had better luck with this nltk stemmer
     stems = [stemmer.stem(lemma) for lemma in lemmas]
     return stems
-	
+
 #  genF1PlotData()
-#  Function takes true and predicted y values and computes an f1 score for every 
+#  Function takes true and predicted y values and computes an f1 score for every
 #	 target category separately
 def genF1PlotData(true, predicted):
 	n = true.shape[1]
@@ -59,17 +59,18 @@ def genF1PlotData(true, predicted):
 		result[i] = f1_score(true[:,i], predicted[:,i], zero_division=0, average='micro',\
 			labels=[1])
 	return result
-	
+
 
 # load data
 engine = create_engine('sqlite:///../data/DisasterResponse.db')
 df = pd.read_sql_table('MessageCategorization', engine)
-# Originally I was going to compute the predicted values, but this takes several 
+# Originally I was going to compute the predicted values, but this takes several
 # minutes and we don't want our web server to be slow.  Let's compute those values
 # in train_classifier.py and write them to disk.  Here we justread them back.
 with open('../models/predicted.joblib', 'rb') as f:
 	y_predicted = joblib.load(f)
-
+with open('../models/canon.joblib', 'rb') as f:
+    canonTable = joblib.load(f)
 
 # load model
 model = joblib.load("../models/classifier.pkl")
@@ -79,12 +80,12 @@ model = joblib.load("../models/classifier.pkl")
 @app.route('/')
 @app.route('/index')
 def index():
-    
+
     # extract data needed for visuals
     y_names = list(df.columns)[4:]
     num_pos = df[y_names].sum()
 
-	# only compute f1 scores on test data, thus we must perform train/test split    
+	# only compute f1 scores on test data, thus we must perform train/test split
     text = df['message'].values
     y = df[y_names].values
     text_train, text_test, y_train, y_test = train_test_split(text, y, \
@@ -95,7 +96,7 @@ def index():
 
 	# compute f1 scores for first plot
     f1_values = genF1PlotData(y_test, y_predicted)
-    
+
     # create visuals
     graphs = [
         {
@@ -122,7 +123,8 @@ def index():
             'data': [
                 Bar(
                     x=num_pos.index,
-                    y=num_pos.values
+                    y=num_pos.values,
+                    text=canonTable
                 )
             ],
 
@@ -138,11 +140,11 @@ def index():
         }
 
     ]
-    
+
     # encode plotly graphs in JSON
     ids = ["graph-{}".format(i) for i, _ in enumerate(graphs)]
     graphJSON = json.dumps(graphs, cls=plotly.utils.PlotlyJSONEncoder)
-    
+
     # render web page with plotly graphs
     return render_template('master.html', ids=ids, graphJSON=graphJSON)
 
@@ -151,7 +153,7 @@ def index():
 @app.route('/go')
 def go():
     # save user input in query
-    query = request.args.get('query', '') 
+    query = request.args.get('query', '')
 
     # use model to predict classification for query
     classification_labels = model.predict([query])[0]
@@ -159,7 +161,7 @@ def go():
 #     print(*classification_labels)
 #     print(*classification_results)
 
-    # This will render the go.html Please see that file. 
+    # This will render the go.html Please see that file.
     return render_template(
         'go.html',
         query=query,
