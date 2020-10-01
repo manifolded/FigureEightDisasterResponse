@@ -7,8 +7,7 @@ import spacy
 from nltk.stem.snowball import SnowballStemmer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.multioutput import MultiOutputClassifier
-from sklearn.ensemble import AdaBoostClassifier
-from sklearn.tree import DecisionTreeClassifier
+from sklearn.svm import LinearSVC
 from sklearn.pipeline import make_pipeline
 from sklearn.metrics import precision_score
 from sklearn.metrics import recall_score
@@ -125,19 +124,16 @@ def tokenize(text):
     return [stemmer.stem(lemma) for lemma in lemmas]
 
 
-def build_nlp_model():
-    """Construct the nlp first stage for the pipeline and returns it."""
-    return make_pipeline(
-        TfidfVectorizer(tokenizer=tokenize, min_df=5))
+def build_vectorizer():
+    """Construct the nlp first stage for the pipeline and return it."""
+    return TfidfVectorizer(tokenizer=tokenize, min_df=5, max_df=0.9)
 
 
-def build_ml_model():
-    """Constructs the ml second stage for the pipeline and returns it."""
-    return make_pipeline(
-        MultiOutputClassifier(
-            estimator=AdaBoostClassifier(
-                base_estimator=DecisionTreeClassifier(max_depth=2),
-                n_estimators=10, learning_rate=1)))
+def build_classifier():
+    """Construct the classifier second stage for the pipeline and return it."""
+    return MultiOutputClassifier(estimator=
+        LinearSVC(C=0.3, dual=False, multi_class='ovr', fit_intercept=True,
+                  max_iter=100))
 
 
 def build_model(vect, clf):
@@ -178,10 +174,10 @@ def main():
         model = build_model(vect, clf)
 
         print('Training model...')
-        X_train = nlp_model.fit_transform(text_train)
-        ml_model.fit(X_train, y_train)
-        X_test = nlp_model.transform(text_test)
-        y_predict = ml_model.predict(X_test)
+        X_train = vect.fit_transform(text_train)
+        clf.fit(X_train, y_train)
+        X_test = vect.transform(text_test)
+        y_predict = clf.predict(X_test)
 
         print('Evaluating model...')
         evaluate_model(model, text_test, y_test, y_predict, category_names)
