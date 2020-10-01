@@ -95,6 +95,7 @@ def load_data(database_filepath):
 
     # remove outliers from 'related' column
     df['related'] = np.clip(df['related'], 0, 1)
+    df.drop('child_alone', axis=1, inplace=True)
 
     text = df[in_columns].values
     y = df[out_columns].values
