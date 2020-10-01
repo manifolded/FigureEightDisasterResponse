@@ -7,6 +7,7 @@ from sklearn.metrics import f1_score
 
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
+import en_core_web_sm
 
 from flask import Flask
 from flask import render_template, request, jsonify
@@ -25,7 +26,8 @@ from sklearn.model_selection import train_test_split
 # nltk.download('wordnet')
 
 import spacy
-en_nlp = spacy.load('en')
+# en_nlp = spacy.load('en')
+en_nlp = en_core_web_sm.load()
 stopwords = spacy.lang.en.stop_words.STOP_WORDS
 
 from nltk.stem.snowball import SnowballStemmer

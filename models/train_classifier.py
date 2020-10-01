@@ -4,6 +4,7 @@ import numpy as np
 import sqlalchemy as sqal
 from sklearn.model_selection import train_test_split
 import spacy
+import en_core_web_sm
 from nltk.stem.snowball import SnowballStemmer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.multioutput import MultiOutputClassifier
@@ -15,7 +16,8 @@ from sklearn.metrics import f1_score
 import pickle as pkl
 import joblib
 
-en_nlp = spacy.load('en')
+# en_nlp = spacy.load('en')
+en_nlp = en_core_web_sm.load()
 stopwords = spacy.lang.en.stop_words.STOP_WORDS
 stemmer = SnowballStemmer('english')
 
