@@ -33,6 +33,7 @@ stemmer = SnowballStemmer('english')
 
 app = Flask(__name__)
 
+
 # https://realpython.com/natural-language-processing-spacy-python/ was very
 #   helpful as I struggled to build this, my first, tokenizer.
 def tokenize(text):
@@ -49,8 +50,7 @@ def tokenize(text):
 
     return stems
 
-#  gen_f1_plot_data()
-#
+
 def gen_f1_plot_data(true, predicted):
     """Takes true and predicted y-values and computes an
     f1 score for every target category separately.
@@ -67,6 +67,25 @@ def gen_f1_plot_data(true, predicted):
 # load data
 engine = create_engine('sqlite:///../data/DisasterResponse.db')
 df = pd.read_sql_table('MessageCategorization', engine)
+
+# correct outlying values in `related` column
+df['related'] = np.clip(df['related'], 0, 1)
+
+# drop 'child_alone' category which has no positives and thus breaks
+#   LinearSVC
+df.drop('child_alone', axis=1, inplace=True)
+
+# extract data needed for visuals
+y_names = list(df.columns)[4:]
+num_pos = df[y_names].sum()
+
+# Only compute f1 scores on test data, thus we must perform train/test
+# split here.
+text = df['message'].values
+y = df[y_names].values
+text_train, text_test, y_train, y_test = train_test_split(
+    text, y, test_size=0.33, random_state=42)
+
 # Originally I was going to compute the predicted values here, but
 # this takes several minutes.  That would be much too slow for this
 # flask app.  Instead, let's pre-compute those values in
@@ -77,31 +96,16 @@ with open('../models/predicted.joblib', 'rb') as f:
 with open('../models/canon.joblib', 'rb') as f:
     canon_table = joblib.load(f)
 
+# compute f1 scores for first plot
+f1_values = gen_f1_plot_data(y_test, y_predicted)
+
 # load model
 model = joblib.load("../models/classifier.pkl")
-
 
 # index webpage displays cool visuals and receives user input text for model
 @app.route('/')
 @app.route('/index')
 def index():
-
-    # extract data needed for visuals
-    y_names = list(df.columns)[4:]
-    num_pos = df[y_names].sum()
-
-	# Only compute f1 scores on test data, thus we must perform train/test
-    # split here.
-    text = df['message'].values
-    y = df[y_names].values
-    text_train, text_test, y_train, y_test = train_test_split(
-        text, y, test_size=0.33, random_state=42)
-
-    print(y_test.shape)
-    print(y_predicted.shape)
-
-	# compute f1 scores for first plot
-    f1_values = gen_f1_plot_data(y_test, y_predicted)
 
     # create visuals
     graphs = [
