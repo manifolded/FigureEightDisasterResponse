@@ -20,13 +20,13 @@ en_nlp = spacy.load('en')
 stopwords = spacy.lang.en.stop_words.STOP_WORDS
 stemmer = SnowballStemmer('english')
 
-def gen_token_table(model, n_vocab):
+def gen_token_table(model, n_vocab, n_categories):
     """Takes the ml_model and the size of the nlp vocabulary, n_vocab,
     and passes every token in the vocabulary to predict().  The results
     are all concatenated together into what I call the 'token table'.
     This takes a few minutes.
     """
-    result = np.zeros(shape = (n_vocab, 36))
+    result = np.zeros(shape = (n_vocab, n_categories))
     for i in range(n_vocab):
         # construct token vector for single token
         token_vector = np.zeros(shape=n_vocab)
@@ -43,7 +43,7 @@ def gen_canon_table(token_table, vocab):
     results, known as a 'canon table'.
     """
     result = []
-    for i in range(36):
+    for i in range(table.shape[1]):
         category_vector = token_table[:,i]
         token_indices = np.where(category_vector == 1)[0]
         # A wily trick for indexing a list
@@ -140,9 +140,9 @@ def build_ml_model():
                 n_estimators=10, learning_rate=1)))
 
 
-def build_model(nlp_model, ml_model):
+def build_model(vect, clf):
     """Combine the two pieces and return the full pipeline."""
-    return make_pipeline(nlp_model, ml_model)
+    return make_pipeline(vect, clf)
 
 
 def evaluate_model(model, text_test, y_test, y_predict, category_names):
@@ -173,9 +173,9 @@ def main():
             = train_test_split(text, y, test_size=0.33)
 
         print('Building model...')
-        nlp_model = build_nlp_model()
-        ml_model = build_ml_model()
-        model = build_model(nlp_model, ml_model)
+        vect = build_vectorizer()
+        clf = build_classifier()
+        model = build_model(vect, clf)
 
         print('Training model...')
         X_train = nlp_model.fit_transform(text_train)
@@ -186,9 +186,9 @@ def main():
         print('Evaluating model...')
         evaluate_model(model, text_test, y_test, y_predict, category_names)
 #        vocab = nlp_model['tfidfvectorizer'].vocabulary_
-        vocab = list(nlp_model['tfidfvectorizer'].vocabulary_.keys())
+        vocab = list(vect.vocabulary_.keys())
         n_voc = len(vocab)
-        token_table = gen_token_table(ml_model, n_voc)
+        token_table = gen_token_table(vect, n_voc, y_test.shape[1])
         canonTable = gen_canon_table(token_table, vocab)
 
         print('Caching data...\n    FILE: predicted.joblib')
