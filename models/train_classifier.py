@@ -90,12 +90,13 @@ def load_data(database_filepath):
     # and grab the table therein
     df = pd.read_sql_table('MessageCategorization', engine)
 
-    in_columns = 'message'
-    out_columns = list(df.columns)[4:]
-
     # remove outliers from 'related' column
     df['related'] = np.clip(df['related'], 0, 1)
+    # drop all negative category to allow use of LinearSVC
     df.drop('child_alone', axis=1, inplace=True)
+
+    in_columns = 'message'
+    out_columns = list(df.columns)[4:]
 
     text = df[in_columns].values
     y = df[out_columns].values
