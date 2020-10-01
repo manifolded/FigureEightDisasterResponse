@@ -69,7 +69,8 @@ engine = create_engine('sqlite:///../data/DisasterResponse.db')
 df = pd.read_sql_table('MessageCategorization', engine)
 
 # correct outlying values in `related` column
-df['related'] = np.clip(df['related'], 0, 1)
+### df['related'] = np.clip(df['related'], 0, 1)
+df['related'].replace(to_replace=[2], value=0, inplace=True)
 
 # drop 'child_alone' category which has no positives and thus breaks
 #   LinearSVC
