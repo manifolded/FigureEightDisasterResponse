@@ -42,7 +42,7 @@ def gen_canon_table(token_table, vocab):
     results, known as a 'canon table'.
     """
     result = []
-    for i in range(table.shape[1]):
+    for i in range(token_table.shape[1]):
         category_vector = token_table[:,i]
         token_indices = np.where(category_vector == 1)[0]
         # A wily trick for indexing a list
@@ -186,7 +186,7 @@ def main():
 #        vocab = nlp_model['tfidfvectorizer'].vocabulary_
         vocab = list(vect.vocabulary_.keys())
         n_voc = len(vocab)
-        token_table = gen_token_table(vect, n_voc, y_test.shape[1])
+        token_table = gen_token_table(clf, n_voc, y_test.shape[1])
         canon_table = gen_canon_table(token_table, vocab)
 
         print('Caching data...\n    FILE: predicted.joblib')
