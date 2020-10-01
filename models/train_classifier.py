@@ -185,7 +185,7 @@ def main():
         vocab = list(vect.vocabulary_.keys())
         n_voc = len(vocab)
         token_table = gen_token_table(vect, n_voc, y_test.shape[1])
-        canonTable = gen_canon_table(token_table, vocab)
+        canon_table = gen_canon_table(token_table, vocab)
 
         print('Caching data...\n    FILE: predicted.joblib')
         with open('predicted.joblib', 'wb') as f:
@@ -196,7 +196,7 @@ def main():
         with open('nlp_vocabulary.joblib', 'wb') as f:
             joblib.dump(vocab, f)
         with open('canon.joblib', 'wb') as f:
-            joblib.dump(canonTable, f)
+            joblib.dump(canon_table, f)
 
         print('Trained model saved!')
 
