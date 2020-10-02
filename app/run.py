@@ -70,7 +70,7 @@ def gen_f1_plot_data(true, predicted):
 engine = sqal.create_engine('sqlite:///../data/DisasterResponse.db')
 print("DisasterResponse.db successfully opened.")
 inspector = sqal.inspect(engine)
-# inspector.get_schema_names()  # -> ['main']
+print("Schema Names: {}".format(inspector.get_schema_names()))  # -> ['main']
 print("Table Names: {}".format(inspector.get_table_names(schema='main')))  # -> ['Message']
 # inspector.get_columns('Message', schema='main')   # -> the goods
 
