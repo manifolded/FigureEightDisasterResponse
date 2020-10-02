@@ -17,7 +17,7 @@ from plotly.graph_objs import Scatter
 # from sklearn.externals import joblib
 import joblib
 
-from sqlalchemy import create_engine
+import sqlalchemy as sqal
 
 from sklearn.model_selection import train_test_split
 
@@ -67,10 +67,11 @@ def gen_f1_plot_data(true, predicted):
 
 
 # load data
-engine = create_engine('sqlite:///../data/DisasterResponse.db')
+engine = sqal.create_engine('sqlite:///../data/DisasterResponse.db')
+print("DisasterResponse.db successfully opened.")
 inspector = sqal.inspect(engine)
 # inspector.get_schema_names()  # -> ['main']
-print(inspector.get_table_names(schema='main'))  # -> ['Message']
+print("Table Names: {}".format(inspector.get_table_names(schema='main')))  # -> ['Message']
 # inspector.get_columns('Message', schema='main')   # -> the goods
 
 df = pd.read_sql_table('MessageCategorization', engine)
