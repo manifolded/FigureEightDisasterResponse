@@ -5,6 +5,7 @@
 *.npy
 *.pkl
 *.joblib
+app/__pycache__
 models/TestingDatabaseFileReading.ipynb
 app/TestModelOutputParsing.ipynb
 models/GeneratingNovelPlots.ipynb
