@@ -8,6 +8,6 @@ pushd models
 python train_classifier.py ../data/DisasterResponse.db classifier.pkl
 popd
 
-pushd app
-python run.py
-popd
+# pushd app
+# python run.py
+# popd

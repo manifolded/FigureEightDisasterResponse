@@ -1,1 +1,1 @@
-web: bash spinitup.sh
+web: pushd app; python run.py
