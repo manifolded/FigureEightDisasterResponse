@@ -21,6 +21,8 @@ import sqlalchemy as sqal
 
 from sklearn.model_selection import train_test_split
 
+import os
+
 # import nltk
 # nltk.download('punkt')
 # nltk.download('wordnet')
