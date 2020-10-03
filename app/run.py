@@ -192,3 +192,8 @@ def main():
 
 if __name__ == '__main__':
     main()
+    # Attempting this solution:
+    # https://stackoverflow.com/questions/17260338/deploying-flask-with-heroku
+    # Bind to PORT if defined, otherwise default to 3001.
+    port = int(os.environ.get('PORT', 3001))
+    app.run(host='0.0.0.0', port=port)
