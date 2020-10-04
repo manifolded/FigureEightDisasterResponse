@@ -34,20 +34,22 @@ If you want to see how the above code was developed have a look at the series of
 
 ## The Flask App
 
+You no longer have to start the Flask app yourself to view the results.  That app is now hosted on Heroku.  You can find it at [https://disaster-message-triage.herokuapp.com/](https://disaster-message-triage.herokuapp.com/).  
+
 ### Trying Out the Classifier
 
-With the flask app in a browser window you can type in the text field near the top and click the button marked "Classify Message".  The results of your query will appear below.  You may have to scroll down in the window to see all the categories.  You will know when the classifier has selected one or more of these target categories because the category label will be highlighted.  
+With the flask app in a browser window you can type a message in the text field near the top and click the button marked "Classify Message".  The results of your query will appear below.  You may have to scroll the window down to see all the categories.  You will know when the classifier has selected one or more of these target categories because the category label will be highlighted.  
 
-This model isn't a great success and more often than not only the first category, 'related', is indicated.  Also, longer messages work better than short ones.  
+This model isn't a great success and more often than not only the first category, 'related', is indicated.  You may find that longer messages work better than short ones.  
 
 ### Analysis of the Model and Dataset
 
 After you run a query the plots will no longer be visible.  To bring them back click on the "Disaster Response Project" link in the upper left corner.
 
-1. The first plot depicts the relationship between how good the model is at predicting against how many rows in the training set were positively labeled for that category.  Each data point is a single category.  The plot is an attempt to diagnose the limitations of the model.  It depicts the rise in score as we move to less imbalanced categories.
+1. The first plot depicts the relationship between how well the model predicts vs. how many rows in the training set were positively labeled.  Each data point is a single category.  The plot is an attempt to diagnose the limitations of the model.  It shows that scores rise as we move to less imbalanced categories.
 
 2. The second plot is very simple on the face of it, but has some hidden gems.  It depicts, as above, the number of positives in each category.  However, if you mouse over one of the bars a little hover blurb will appear.  These blurbs display the 'canon tokens' for that category.  These are the words (more accurately "stemmed tokens") that map to that category.  It is amusing to try and discern the link between the tokens and the category they correspond with.  Also note that it appears that the number of 'canon tokens' appears to correspond with the number of positives.
 
 ## Acknowledgements
 
-Thanks for Figure Eight for providing me the data, and Udacity for introducing me to the techniques.  Cheers.
+Thanks to Figure Eight for providing me the data, and Udacity for introducing me to the techniques.  Cheers.
