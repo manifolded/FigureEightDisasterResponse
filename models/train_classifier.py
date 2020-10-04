@@ -10,6 +10,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.multioutput import MultiOutputClassifier
 from sklearn.svm import LinearSVC
 from sklearn.pipeline import make_pipeline
+from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import precision_score
 from sklearn.metrics import recall_score
 from sklearn.metrics import f1_score
@@ -79,6 +80,21 @@ def print_scores(labels, true, pred, zero_division='warn'):
     for i in range(results.shape[0]):
         print("{0:>20}".format(labels[i]), '%.2f' % results[i, 0],
             '%.2f' % results[i,1], '%.2f' % results[i,2], sep = '\t')
+
+
+def grid_search(model, X_train, y_train):
+    """Employs GridSearchCV to tune the classifier part of the pipeline.
+    In particular, we're tuning the C parameter of LinearSVC.  Returns
+    the optimized classifier.
+    """
+    # perform search over the C parameter of LinearSVC
+    param_grid = {'estimator__C': [0.03, 0.1, 0.3, 1.0]}
+    # extract only the classifier half of the pipeline and perform
+    # grid search on that
+    grid = GridSearchCV(estimator=model['multioutputclassifier'],
+                        param_grid=param_grid, cv=5, n_jobs=-1)
+    grid.fit(X_train, y_train)
+    return grid
 
 
 def load_data(database_filepath):
@@ -182,14 +198,18 @@ def main():
         X_train = vect.fit_transform(text_train)
         clf.fit(X_train, y_train)
         X_test = vect.transform(text_test)
-        y_predict = clf.predict(X_test)
+
+        print('Tuning parameters...')
+        grid = grid_search(model, X_train, y_train)
+        y_predict = grid.predict(X_test)
+        model = make_pipeline(vect, grid)
 
         print('Evaluating model...')
         evaluate_model(model, text_test, y_test, y_predict, category_names)
 #        vocab = nlp_model['tfidfvectorizer'].vocabulary_
         vocab = list(vect.vocabulary_.keys())
         n_voc = len(vocab)
-        token_table = gen_token_table(clf, n_voc, y_test.shape[1])
+        token_table = gen_token_table(grid, n_voc, y_test.shape[1])
         canon_table = gen_canon_table(token_table, vocab)
 
         print('Caching data...\n    FILE: predicted.joblib')
