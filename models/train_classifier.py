@@ -108,9 +108,6 @@ def load_data(database_filepath):
     # and grab the table therein
     df = pd.read_sql_table('MessageCategorization', engine)
 
-    # remove outliers from 'related' column
-    ### df['related'] = np.clip(df['related'], 0, 1)
-    df['related'].replace(to_replace=[2], value=0, inplace=True)
     # drop all negative category to allow use of LinearSVC
     df.drop('child_alone', axis=1, inplace=True)
 
