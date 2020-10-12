@@ -10,5 +10,6 @@ models/TestingDatabaseFileReading.ipynb
 app/TestModelOutputParsing.ipynb
 models/GeneratingNovelPlots.ipynb
 models/predicted.joblib
+lemm_vs_stem.py
 .DS_Store
 *~
