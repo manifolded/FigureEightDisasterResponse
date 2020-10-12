@@ -3,9 +3,10 @@ import pandas as pd
 import numpy as np
 import sqlalchemy as sqal
 from sklearn.model_selection import train_test_split
-import spacy
-import en_core_web_sm
-from nltk.stem.snowball import SnowballStemmer
+from nltk.corpus import stopwords
+from nltk.stem.wordnet import WordNetLemmatizer
+from nltk.tokenize import word_tokenize
+import re
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.multioutput import MultiOutputClassifier
 from sklearn.svm import LinearSVC
@@ -17,10 +18,6 @@ from sklearn.metrics import f1_score
 import pickle as pkl
 import joblib
 
-# en_nlp = spacy.load('en')
-en_nlp = en_core_web_sm.load()
-stopwords = spacy.lang.en.stop_words.STOP_WORDS
-stemmer = SnowballStemmer('english')
 
 def gen_token_table(model, n_vocab, n_categories):
     """Takes the ml_model and the size of the nlp vocabulary, n_vocab,
@@ -131,15 +128,26 @@ def tokenize(text):
     and then lemmatizing the words using the spaCy library.  Finally the
     tokens are stemmed.  The resulting list of tokens is returned.
     """
-    # tokenize the text using spacy's model for English
-    doc = en_nlp(text)
-    # while we lemmatize the now tokenized text, let's not forget to drop
-    #   tokens that are stop_words or punctuation
-    lemmas = [token.lemma_ for token in doc
-        if token not in stopwords and not token.is_punct]
-    # Had better luck with this nltk stemmer
+    # This experiment convinced me to lemmatize only rather than lemmatize and
+    # stem.  I also got this nifty URL detector there.
+    #https://gist.github.com/rajatsharma369007/de1e2024707ad90a73226643c314b118
 
-    return [stemmer.stem(lemma) for lemma in lemmas]
+    # initialization
+    lemmatizer = WordNetLemmatizer()
+    stop = stopwords.words("english")
+
+    # Replaced all URLs with 'urlplaceholder'
+    url_regex = 'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|'+\
+                '(?:%[0-9a-fA-F][0-9a-fA-F]))+'
+    for url in re.findall(url_regex, text):
+        text = text.replace(url, "urlplaceholder")
+
+    # tokenize and lemmatize
+    tokens = word_tokenize(text)
+    tokens = [lemmatizer.lemmatize(token).lower().strip() for
+              token in tokens if token not in stop]
+
+    return tokens
 
 
 def build_vectorizer():
