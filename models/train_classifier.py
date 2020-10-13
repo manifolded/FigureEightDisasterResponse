@@ -196,7 +196,8 @@ def main():
         y_predict = grid.predict(text_test)
 
         print('Evaluating model...')
-        evaluate_model(grid.best_estimator_, text_test, y_test, y_predict,
+        model = grid.best_estimator_
+        evaluate_model(model, text_test, y_test, y_predict,
                        category_names)
 #        vocab = nlp_model['tfidfvectorizer'].vocabulary_
         vocab = list(model['countvectorizer'].get_feature_names())
