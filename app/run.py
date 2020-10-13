@@ -107,7 +107,9 @@ with open('../models/canon.joblib', 'rb') as f:
 f1_values = gen_f1_plot_data(y_test, y_predicted)
 
 # load model
-model = pkl.load("../models/classifier.pkl")
+with open('../models/classifier.pkl', 'rb') as f:
+    model = pkl.load(f)
+# model = pkl.load("../models/classifier.pkl")
 
 # index webpage displays cool visuals and receives user input text for model
 @app.route('/')
