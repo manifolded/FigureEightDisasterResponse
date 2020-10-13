@@ -3,8 +3,13 @@ import pandas as pd
 from sqlalchemy import create_engine
 
 def load_data(messages_filepath, categories_filepath):
-    """Ingests message and category data from files and returns a single
-    dataframe holding the two parts properly merged.
+    """Ingests message and category data from .csv files.
+
+    INPUT:
+        messages_filepath - (str) path to messages .csv file
+        categories_filepath - (str) path to categories .csv file
+    OUTPUT:
+        df - (pandas.DataFrame) cleaned and merged single dataset
     """
     # Load the two source .csv's into DataFrames
     messages = pd.read_csv(messages_filepath)
@@ -34,16 +39,29 @@ def load_data(messages_filepath, categories_filepath):
 
 
 def clean_data(df):
-    """Removes any duplicates from the dataframe."""
+    """Removes any duplicates from the dataset.
+
+    INPUT:
+        df - (pandas.DataFrame) dataset to be cleaned
+    OUTPUT:
+        df - (pandas.DataFrame) dataset with duplicate rows removed
+    Note:  You must assign the output, cleaning does not occur in place.
+    """
     df = df.drop_duplicates()
+
     return df
 
 
 def save_data(df, database_filename):
-    """Constructs a database and writes the dataframe to it."""
+    """Constructs a database on disk and writes the dataset to it.
+
+    INPUT:
+        df - (pandas.DataFrame) dataset to be written to database file
+    """
     engine = create_engine('sqlite:///'+database_filename)
     df.to_sql('MessageCategorization', engine, index=False,
               if_exists='replace')
+
     return
 
 

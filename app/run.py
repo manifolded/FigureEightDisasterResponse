@@ -35,9 +35,13 @@ app = Flask(__name__)
 
 
 def tokenize(text):
-    """Takes a string (the message) and normalizes it by first tokenizing
-    and then lemmatizing the words using nltk.  The resulting list of tokens
-    is returned.
+    """Normalizes text in input message 'text' by lemmatizing words into
+    tokens. Also removes URLs and stopwords.
+
+    INPUT:
+        text - (str) input message to be tokenized
+    OUTPUT:
+        tokens - (list) of tokens
     """
     # This experiment convinced me to lemmatize only rather than lemmatize and
     # stem.  I also got this nifty URL detector there.
@@ -62,8 +66,13 @@ def tokenize(text):
 
 
 def gen_f1_plot_data(true, predicted):
-    """Takes true and predicted y-values and computes an
-    f1 score for every target category separately.
+    """Computes an f1 score for every target feature separately.
+
+    INPUT:
+        true - (pandas.DataFrame) actual y-values from test set
+        pred - (pandas.DataFrame) predicted y-values for test set
+    OUTPUT:
+        f1_plot_data - (numpy.array) list of f1 scores
     """
     n = true.shape[1]
     result = np.empty(shape=n)
