@@ -23,6 +23,10 @@ def load_data(messages_filepath, categories_filepath):
         # set value to be the last character of the string and cast it to int
         categories[column] = categories[column].str.slice(start=-1).astype(int)
 
+    # Ensure values in category columns are binary
+    #   remove outliers from 'related' column that uses 0, 1, 2
+    categories['related'].replace(to_replace=[2], value=0, inplace=True)
+
     # Finally we have to merge the two datasets into one
     return pd.merge(
         left=messages, right=categories, left_index=True, right_index=True,
