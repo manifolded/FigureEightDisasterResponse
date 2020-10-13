@@ -16,6 +16,7 @@ from flask import Flask
 from flask import render_template, request, jsonify
 from plotly.graph_objs import Bar
 from plotly.graph_objs import Scatter
+from plotly.graph_objs import Heatmap
 
 import pickle as pkl
 # from sklearn.externals import joblib
@@ -115,10 +116,14 @@ with open('../models/canon.joblib', 'rb') as f:
 # compute f1 scores for first plot
 f1_values = gen_f1_plot_data(y_test, y_predicted)
 
-# load model
+# load model for hover notes on second plot
 with open('../models/classifier.pkl', 'rb') as f:
     model = pkl.load(f)
-# model = pkl.load("../models/classifier.pkl")
+
+# compute correlations for third plot
+y_df = pd.DataFrame(data=y, columns=y_names)
+corr_table = y_df.corr()
+
 
 # index webpage displays cool visuals and receives user input text for model
 @app.route('/')
@@ -147,7 +152,7 @@ def index():
                 }
             }
         },
-                {
+        {
             'data': [
                 Bar(
                     x=num_pos.index,
@@ -165,8 +170,30 @@ def index():
                     'title': "Category"
                 }
             }
+        },
+        {
+            'data': [
+                Heatmap(
+                    x=y_names,
+                    y=y_names,
+                    z=corr_table
+                )
+            ],
+            'layout': {
+                'title': 'Correlations Between Target Features in Labeled Samples',
+                'yaxis': {
+# https://stackoverflow.com/questions/55013995/plotly-heatmap-speed-and-aspect-ratio
+                    'scaleanchor': 'x',
+                    'autorange': 'reversed'
+                },
+                'xaxis': {
+                },
+# https://plotly.com/python/setting-graph-size/
+                'autosize': True,
+                'width': 700,
+                'height': 700
+            }
         }
-
     ]
 
     # encode plotly graphs in JSON
