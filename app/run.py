@@ -72,10 +72,6 @@ def gen_f1_plot_data(true, predicted):
 engine = sqal.create_engine('sqlite:///../data/DisasterResponse.db')
 df = pd.read_sql_table('MessageCategorization', engine)
 
-# correct outlying values in `related` column
-### df['related'] = np.clip(df['related'], 0, 1)
-df['related'].replace(to_replace=[2], value=0, inplace=True)
-
 # drop 'child_alone' category which has no positives and thus breaks
 #   LinearSVC
 df.drop('child_alone', axis=1, inplace=True)
