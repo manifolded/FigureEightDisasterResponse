@@ -7,13 +7,17 @@ from sklearn.metrics import f1_score
 
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
-import en_core_web_sm
+from nltk.corpus import stopwords
+import re
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfTransformer
 
 from flask import Flask
 from flask import render_template, request, jsonify
 from plotly.graph_objs import Bar
 from plotly.graph_objs import Scatter
 
+import pickle as pkl
 # from sklearn.externals import joblib
 import joblib
 
@@ -27,32 +31,34 @@ import os
 # nltk.download('punkt')
 # nltk.download('wordnet')
 
-import spacy
-# en_nlp = spacy.load('en')
-en_nlp = en_core_web_sm.load()
-stopwords = spacy.lang.en.stop_words.STOP_WORDS
-
-from nltk.stem.snowball import SnowballStemmer
-stemmer = SnowballStemmer('english')
-
 app = Flask(__name__)
 
 
-# https://realpython.com/natural-language-processing-spacy-python/ was very
-#   helpful as I struggled to build this, my first, tokenizer.
 def tokenize(text):
-    """Takes a string containing a message and returns a list
-    of tokens."""
-    # tokenize the text using spacy's model for English
-    doc = en_nlp(text)
-    # while we lemmatize the now tokenized text, let's not forget to drop
-    #   tokens that are stop_words or punctuation
-    lemmas = [token.lemma_ for token in doc
-        if token not in stopwords and not token.is_punct]
-    # Had better luck with this nltk stemmer
-    stems = [stemmer.stem(lemma) for lemma in lemmas]
+    """Takes a string (the message) and normalizes it by first tokenizing
+    and then lemmatizing the words using nltk.  The resulting list of tokens
+    is returned.
+    """
+    # This experiment convinced me to lemmatize only rather than lemmatize and
+    # stem.  I also got this nifty URL detector there.
+    #https://gist.github.com/rajatsharma369007/de1e2024707ad90a73226643c314b118
 
-    return stems
+    # initialization
+    lemmatizer = WordNetLemmatizer()
+    stop = stopwords.words("english")
+
+    # Replaced all URLs with 'urlplaceholder'
+    url_regex = 'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|'+\
+                '(?:%[0-9a-fA-F][0-9a-fA-F]))+'
+    for url in re.findall(url_regex, text):
+        text = text.replace(url, "urlplaceholder")
+
+    # tokenize and lemmatize
+    tokens = word_tokenize(text)
+    tokens = [lemmatizer.lemmatize(token).lower().strip() for
+              token in tokens if token not in stop]
+
+    return tokens
 
 
 def gen_f1_plot_data(true, predicted):
@@ -101,7 +107,7 @@ with open('../models/canon.joblib', 'rb') as f:
 f1_values = gen_f1_plot_data(y_test, y_predicted)
 
 # load model
-model = joblib.load("../models/classifier.pkl")
+model = pkl.load("../models/classifier.pkl")
 
 # index webpage displays cool visuals and receives user input text for model
 @app.route('/')
