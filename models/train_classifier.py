@@ -7,7 +7,8 @@ from nltk.corpus import stopwords
 from nltk.stem.wordnet import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
 import re
-from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.multioutput import MultiOutputClassifier
 from sklearn.svm import LinearSVC
 from sklearn.pipeline import make_pipeline
@@ -79,18 +80,15 @@ def print_scores(labels, true, pred, zero_division='warn'):
             '%.2f' % results[i,1], '%.2f' % results[i,2], sep = '\t')
 
 
-def grid_search(model, X_train, y_train):
+def grid_search(model, text_train, y_train):
     """Employs GridSearchCV to tune the classifier part of the pipeline.
     In particular, we're tuning the C parameter of LinearSVC.  Returns
     the optimized classifier.
     """
     # perform search over the C parameter of LinearSVC
-    param_grid = {'estimator__C': [0.03, 0.1, 0.3, 1.0]}
-    # extract only the classifier half of the pipeline and perform
-    # grid search on that
-    grid = GridSearchCV(estimator=model['multioutputclassifier'],
-                        param_grid=param_grid, cv=5, n_jobs=-1)
-    grid.fit(X_train, y_train)
+    param_grid = {'multioutputclassifier__estimator__C': [0.03, 0.1, 0.3, 1.0]}
+    grid = GridSearchCV(estimator=model, param_grid=param_grid, cv=5)
+    grid.fit(text_train, y_train)
     return grid
 
 
@@ -150,21 +148,14 @@ def tokenize(text):
     return tokens
 
 
-def build_vectorizer():
-    """Construct the nlp first stage for the pipeline and return it."""
-    return TfidfVectorizer(tokenizer=tokenize, min_df=5, max_df=0.9)
-
-
-def build_classifier():
-    """Construct the classifier second stage for the pipeline and return it."""
-    return MultiOutputClassifier(estimator=
-        LinearSVC(C=0.3, dual=False, multi_class='ovr', fit_intercept=True,
-                  max_iter=100))
-
-
-def build_model(vect, clf):
-    """Combine the two pieces and return the full pipeline."""
-    return make_pipeline(vect, clf)
+def build_model():
+    """Construct the full pipeline."""
+    return make_pipeline(
+        CountVectorizer(tokenizer=tokenize, min_df=10, max_df=0.10),
+        TfidfTransformer(use_idf=True, smooth_idf=True, sublinear_tf=True),
+        MultiOutputClassifier(estimator=
+            LinearSVC(C=0.2, dual=False, multi_class='ovr',
+                fit_intercept=True, max_iter=100)))
 
 
 def evaluate_model(model, text_test, y_test, y_predict, category_names):
@@ -195,26 +186,24 @@ def main():
             = train_test_split(text, y, test_size=0.33)
 
         print('Building model...')
-        vect = build_vectorizer()
-        clf = build_classifier()
-        model = build_model(vect, clf)
+        model = build_model()
 
         print('Training model...')
-        X_train = vect.fit_transform(text_train)
-        clf.fit(X_train, y_train)
-        X_test = vect.transform(text_test)
+        model.fit(text_train, y_train)
 
         print('Tuning parameters...')
-        grid = grid_search(model, X_train, y_train)
-        y_predict = grid.predict(X_test)
-        model = make_pipeline(vect, grid)
+        grid = grid_search(model, text_train, y_train)
+        y_predict = grid.predict(text_test)
 
         print('Evaluating model...')
-        evaluate_model(model, text_test, y_test, y_predict, category_names)
+        evaluate_model(grid.best_estimator_, text_test, y_test, y_predict,
+                       category_names)
 #        vocab = nlp_model['tfidfvectorizer'].vocabulary_
-        vocab = list(vect.vocabulary_.keys())
+        vocab = list(model['countvectorizer'].get_feature_names())
         n_voc = len(vocab)
-        token_table = gen_token_table(grid, n_voc, y_test.shape[1])
+        tail_model = make_pipeline(model['tfidftransformer'],
+                                   model['multioutputclassifier'])
+        token_table = gen_token_table(tail_model, n_voc, y_test.shape[1])
         canon_table = gen_canon_table(token_table, vocab)
 
         print('Caching data...\n    FILE: predicted.joblib')
