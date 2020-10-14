@@ -16,6 +16,7 @@ from flask import Flask
 from flask import render_template, request, jsonify
 from plotly.graph_objs import Bar
 from plotly.graph_objs import Scatter
+from plotly.graph_objs import Heatmap
 
 import pickle as pkl
 # from sklearn.externals import joblib
@@ -35,9 +36,13 @@ app = Flask(__name__)
 
 
 def tokenize(text):
-    """Takes a string (the message) and normalizes it by first tokenizing
-    and then lemmatizing the words using nltk.  The resulting list of tokens
-    is returned.
+    """Normalizes text in input message 'text' by lemmatizing words into
+    tokens. Also removes URLs and stopwords.
+
+    INPUT:
+        text - (str) input message to be tokenized
+    OUTPUT:
+        tokens - (list) of tokens
     """
     # This experiment convinced me to lemmatize only rather than lemmatize and
     # stem.  I also got this nifty URL detector there.
@@ -62,8 +67,13 @@ def tokenize(text):
 
 
 def gen_f1_plot_data(true, predicted):
-    """Takes true and predicted y-values and computes an
-    f1 score for every target category separately.
+    """Computes an f1 score for every target feature separately.
+
+    INPUT:
+        true - (pandas.DataFrame) actual y-values from test set
+        pred - (pandas.DataFrame) predicted y-values for test set
+    OUTPUT:
+        f1_plot_data - (numpy.array) list of f1 scores
     """
     n = true.shape[1]
     result = np.empty(shape=n)
@@ -106,10 +116,16 @@ with open('../models/canon.joblib', 'rb') as f:
 # compute f1 scores for first plot
 f1_values = gen_f1_plot_data(y_test, y_predicted)
 
-# load model
+# load model for hover notes on second plot
 with open('../models/classifier.pkl', 'rb') as f:
     model = pkl.load(f)
-# model = pkl.load("../models/classifier.pkl")
+
+# compute correlations for third plot
+y_df = pd.DataFrame(data=y, columns=y_names)
+corr_table = y_df.corr()
+x_feature='weather_related'
+y_feature='aid_related'
+
 
 # index webpage displays cool visuals and receives user input text for model
 @app.route('/')
@@ -138,7 +154,7 @@ def index():
                 }
             }
         },
-                {
+        {
             'data': [
                 Bar(
                     x=num_pos.index,
@@ -156,8 +172,52 @@ def index():
                     'title': "Category"
                 }
             }
+        },
+        {
+            'data': [
+                Heatmap(
+                    x=y_names,
+                    y=y_names,
+                    z=corr_table
+                )
+            ],
+            'layout': {
+                'title': 'Correlations Between Target Features in Labeled Samples',
+                'yaxis': {
+# https://stackoverflow.com/questions/55013995/plotly-heatmap-speed-and-aspect-ratio
+                    'scaleanchor': 'x',
+                    'autorange': 'reversed'
+                },
+                'xaxis': {
+                },
+# https://plotly.com/python/setting-graph-size/
+                'autosize': True,
+                'width': 700,
+                'height': 700
+            }
+        },
+        {
+            'data': [
+                Scatter(
+                    x=corr_table[x_feature],
+                    y=corr_table[y_feature],
+                    mode='markers',
+                    text=corr_table.columns
+                )
+            ],
+            'layout': {
+                'title': 'An Alternate View Of Feature Correlations',
+                'yaxis': {
+                    'title': y_feature
+                },
+                'xaxis': {
+                    'title': x_feature
+                },
+                'autosize': True,
+                'width': 600,
+                'height': 600
+            }
         }
-
     ]
 
     # encode plotly graphs in JSON
