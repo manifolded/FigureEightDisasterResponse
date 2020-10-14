@@ -50,6 +50,10 @@ After you run a query the plots will no longer be visible.  To bring them back c
 
 2. The second plot is very simple on the face of it, but has some hidden gems.  It depicts, as above, the number of positives in each category.  However, if you mouse over one of the bars a little hover blurb will appear.  These blurbs display the 'canon tokens' for that category.  These are the words (more accurately "stemmed tokens") that map to that category.  It is amusing to try and discern the link between the tokens and the category they correspond with.  Also note that it appears that the number of 'canon tokens' appears to correspond with the number of positives.
 
+3. The third chart is a heat map depicting correlations between target features based solely on the labeled samples in the dataset.  If you hover the mouse over any of the small squares a little pop-up will show you exactly which two features correspond to that square.  For the most part you'll find that these correlations are fairly predictable: it's not a major surprise to find that 'storm' and 'weather-related' are highly correlated.  But there are some surprises in there as well.  For example, it seems strange to me that there aren't more negative correlation coefficients with greater magnitudes.
+
+4. The fourth and last plot is a bit of an experiment.  This presents an alternative approach to plotting the correlation data presented in the heat map.  Two "special" features are chosen as the axes, and then the scatterplot depicts where all the features lie according to their correlations with those two.  The motivation for this plot comes from my suspicion that a heavy dose of dimensionality reduction would do this project a world of good.  My fantasy was that this sort of plot would allow me to find especially fundamental features, perhaps basis vectors in this dimensionally reduced space, but I'm not sure this plot is the right tool.  What do you think?
+
 ## Acknowledgements
 
 Thanks to Figure Eight for providing me the data, and Udacity for introducing me to the techniques.  Cheers.
