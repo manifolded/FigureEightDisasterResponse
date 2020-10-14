@@ -123,6 +123,8 @@ with open('../models/classifier.pkl', 'rb') as f:
 # compute correlations for third plot
 y_df = pd.DataFrame(data=y, columns=y_names)
 corr_table = y_df.corr()
+x_feature='weather_related'
+y_feature='aid_related'
 
 
 # index webpage displays cool visuals and receives user input text for model
@@ -192,6 +194,28 @@ def index():
                 'autosize': True,
                 'width': 700,
                 'height': 700
+            }
+        },
+        {
+            'data': [
+                Scatter(
+                    x=corr_table[x_feature],
+                    y=corr_table[y_feature],
+                    mode='markers',
+                    text=corr_table.columns
+                )
+            ],
+            'layout': {
+                'title': 'An Alternate View Of Feature Correlations',
+                'yaxis': {
+                    'title': y_feature
+                },
+                'xaxis': {
+                    'title': x_feature
+                },
+                'autosize': True,
+                'width': 600,
+                'height': 600
             }
         }
     ]
